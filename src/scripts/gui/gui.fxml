@@ -83,9 +83,9 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Profile Name" GridPane.columnIndex="1" GridPane.rowIndex="13" />
             <ButtonBar prefHeight="38.0" prefWidth="438.0" style="-fx-background-color: grey;" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
                <buttons>
-                  <Button fx:id="btnSave" mnemonicParsing="false" text="Save" />
-                  <Button fx:id="btnLoad" mnemonicParsing="false" text="Load" />
-                  <Button fx:id="btnStart" mnemonicParsing="false" text="Start" />
+                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSavePressed" text="Save" />
+                  <Button fx:id="btnLoad" mnemonicParsing="false" onAction="#btnLoadPressed" text="Load" />
+                  <Button fx:id="btnStart" mnemonicParsing="false" onAction="#btnStartPressed" text="Start" />
                </buttons>
                <padding>
                   <Insets right="10.0" />
