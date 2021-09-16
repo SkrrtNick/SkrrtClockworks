@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import org.tribot.script.sdk.util.ScriptSettings;
+import scripts.api.functions.Loggable;
 import scripts.api.functions.Logger;
 import scripts.data.Profile;
 
@@ -79,7 +80,15 @@ public class GUIController extends AbstractGUIController {
 
     @FXML
     void btnLoadPressed(ActionEvent event) {
-        load(txtProfile.getValue());
+        String profileName = txtProfile.getValue();
+        if(profileName.equals("")){
+            logger.setLoggable(Loggable.ERROR)
+                    .setMessage("Please enter a profile name")
+                    .print();
+        }
+        else {
+            load(txtProfile.getValue());
+        }
     }
 
     @FXML
@@ -119,7 +128,7 @@ public class GUIController extends AbstractGUIController {
         ScriptSettings loader = ScriptSettings.getDefault();
         loader.load(name, Profile.class)
                 .ifPresent(s -> {
-                    logger.setMessage("Successfully loaded the profile")
+                    logger.setLoggable(Loggable.MESSAGE).setMessage("Successfully loaded the profile")
                             .print();
                     sliderMouseSpeed.setValue(s.getMouseSpeed());
                     craftingFactory.setValue(s.getCraftingGoal());
