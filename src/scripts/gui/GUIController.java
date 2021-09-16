@@ -87,6 +87,8 @@ public class GUIController extends AbstractGUIController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        spinCrafting.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(8,15));
+        spinConstruction.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(25,50));
         sliderMouseSpeed.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
