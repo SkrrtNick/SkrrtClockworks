@@ -32,7 +32,7 @@ public class SkrrtClockWork extends Script implements Painting {
     @Override
     public void run() {
         try{
-            fxml = new File(Util.getWorkingDirectory() + "\\src\\scripts\\api\\gui\\gui.fxml").toURI().toURL();
+            fxml = new URL("https://raw.githubusercontent.com/SkrrtNick/SkrrtClockworks/master/src/scripts/gui/gui.fxml");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
