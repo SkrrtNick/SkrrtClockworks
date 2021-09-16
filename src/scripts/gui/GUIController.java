@@ -2,6 +2,7 @@ package scripts.gui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,6 +12,7 @@ import org.tribot.script.sdk.util.ScriptSettings;
 import scripts.data.Profile;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class GUIController extends AbstractGUIController {
@@ -64,7 +66,7 @@ public class GUIController extends AbstractGUIController {
     private Text txtMouseSpeed;
 
     @FXML
-    private TextField txtProfile;
+    private ChoiceBox<String> txtProfile;
 
     @FXML
     private Text txtReactionTimes;
@@ -78,16 +80,19 @@ public class GUIController extends AbstractGUIController {
 
     @FXML
     void btnSavePressed(ActionEvent event) {
-        save();
+        save(txtProfile.getValue());
     }
 
     @FXML
     void btnStartPressed(ActionEvent event) {
-
+        save("last");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        ScriptSettings loadableProfiles = ScriptSettings.getDefault();
+        List<String> profiles = loadableProfiles.getSaveNames();
+        txtProfile.setItems(FXCollections.observableList(profiles));
         spinCrafting.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(8,15));
         spinConstruction.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(25,50));
         sliderMouseSpeed.valueProperty().addListener(new ChangeListener<Number>() {
@@ -107,7 +112,7 @@ public class GUIController extends AbstractGUIController {
 
     }
 
-    public void save() {
+    public void save(String name) {
         ScriptSettings saver = ScriptSettings.getDefault();
         Profile profile = new Profile();
         profile.setCraftingGoal(spinCrafting.getValue());
@@ -120,7 +125,7 @@ public class GUIController extends AbstractGUIController {
         profile.setTrainSkills(checkSkills.isSelected());
         profile.setUseCustomMouseSpeed(checkMouseSpeed.isSelected());
         profile.setUseCustomReactionTimes(checkReactions.isSelected());
-        saver.save(txtProfile.getText(), profile);
+        saver.save(name, profile);
     }
 
 
