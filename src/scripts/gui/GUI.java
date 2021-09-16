@@ -9,12 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.tribot.api.General;
-import org.tribot.api.Timing;
 import org.tribot.script.sdk.Waiting;
 import scripts.api.functions.Loggable;
 import scripts.api.functions.Logger;
-
 
 import javax.swing.*;
 import java.net.URL;
@@ -169,6 +166,6 @@ public class GUI extends Application {
     }
 
     private void waitForInit() {
-        Waiting.waitUntil(5000,()->stage!=null);
+        Waiting.waitUntil(5000, () -> stage != null);
     }
 }
