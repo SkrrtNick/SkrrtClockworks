@@ -2,6 +2,7 @@ package scripts.gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -54,7 +55,13 @@ public class GUIController extends AbstractGUIController{
     private Spinner<?> spinCrafting;
 
     @FXML
+    private Text txtMouseSpeed;
+
+    @FXML
     private TextField txtProfile;
+
+    @FXML
+    private Text txtReactionTimes;
 
 
     @Override

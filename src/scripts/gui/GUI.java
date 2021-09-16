@@ -123,7 +123,6 @@ public class GUI extends Application {
             guiLogger.setLoggable(Loggable.ERROR).setMessage("Please add a controller to your fxml!").print();
             return;
         }
-
         controller.setGUI(this);
 
         scene = new Scene(box);
@@ -136,7 +135,7 @@ public class GUI extends Application {
             scene.getStylesheets().add(this.stylesheet.toExternalForm());
 
         stage.setScene(scene);
-
+        stage.setTitle("SkrrtClockworks");
     }
 
     public <T extends AbstractGUIController> T getController() {
