@@ -66,7 +66,7 @@ public class GUIController extends AbstractGUIController {
     private Text txtMouseSpeed;
 
     @FXML
-    private ChoiceBox<String> txtProfile;
+    private ComboBox<String> txtProfile;
 
     @FXML
     private Text txtReactionTimes;
