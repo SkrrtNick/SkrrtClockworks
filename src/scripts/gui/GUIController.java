@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import org.tribot.script.sdk.Log;
 import org.tribot.script.sdk.util.ScriptSettings;
 import scripts.data.Profile;
 
@@ -119,7 +120,7 @@ public class GUIController extends AbstractGUIController {
         profile.setTrainSkills(checkSkills.isSelected());
         profile.setUseCustomMouseSpeed(checkMouseSpeed.isSelected());
         profile.setUseCustomReactionTimes(checkReactions.isSelected());
-        saver.save(txtProfile.getText(), saver);
+        saver.save(txtProfile.getText(), profile);
     }
 
 
