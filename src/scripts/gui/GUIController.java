@@ -1,5 +1,7 @@
 package scripts.gui;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
@@ -7,7 +9,7 @@ import javafx.scene.text.Text;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class GUIController extends AbstractGUIController{
+public class GUIController extends AbstractGUIController {
 
     @FXML
     private Button btnLoad;
@@ -37,10 +39,10 @@ public class GUIController extends AbstractGUIController{
     private CheckBox checkSkills;
 
     @FXML
-    private ComboBox<?> comboPricing;
+    private ComboBox<String> comboPricing;
 
     @FXML
-    private ComboBox<?> comboTeleport;
+    private ComboBox<String> comboTeleport;
 
     @FXML
     private Slider sliderMouseSpeed;
@@ -49,10 +51,10 @@ public class GUIController extends AbstractGUIController{
     private Slider sliderReactions;
 
     @FXML
-    private Spinner<?> spinConstruction;
+    private Spinner<Integer> spinConstruction;
 
     @FXML
-    private Spinner<?> spinCrafting;
+    private Spinner<Integer> spinCrafting;
 
     @FXML
     private Text txtMouseSpeed;
@@ -63,9 +65,18 @@ public class GUIController extends AbstractGUIController{
     @FXML
     private Text txtReactionTimes;
 
+    int mouseSpeed, reactions;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        sliderMouseSpeed.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                mouseSpeed = (int) sliderMouseSpeed.getValue();
+                txtMouseSpeed.setText(Integer.toString(mouseSpeed));
+            }
+        });
 
     }
 }

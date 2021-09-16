@@ -75,10 +75,10 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Train construction to" GridPane.columnIndex="1" GridPane.rowIndex="8" />
             <CheckBox fx:id="checkSkills" mnemonicParsing="false" text="Train Skills" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <CheckBox fx:id="checkMouseSpeed" mnemonicParsing="false" prefHeight="17.0" prefWidth="168.0" text="Use custom Mouse Speed" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="9" />
-            <Slider fx:id="sliderMouseSpeed" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+            <Slider fx:id="sliderMouseSpeed" max="300.0" min="100.0" value="150.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10" />
             <Text fx:id="txtMouseSpeed" strokeType="OUTSIDE" strokeWidth="0.0" text="0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" />
             <CheckBox fx:id="checkReactions" mnemonicParsing="false" prefHeight="17.0" prefWidth="168.0" text="Use custom Reaction times" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="11" />
-            <Slider fx:id="sliderReactions" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+            <Slider fx:id="sliderReactions" min="-100.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12" />
             <TextField fx:id="txtProfile" GridPane.columnIndex="2" GridPane.rowIndex="13" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Profile Name" GridPane.columnIndex="1" GridPane.rowIndex="13" />
             <ButtonBar prefHeight="38.0" prefWidth="438.0" style="-fx-background-color: grey;" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
