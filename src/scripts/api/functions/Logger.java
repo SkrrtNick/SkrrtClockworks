@@ -11,7 +11,7 @@ public class Logger {
     @Setter @Getter @Accessors(chain = true)
     private String message;
     @Setter @Getter @Accessors(chain = true)
-    private Loggable loggable;
+    private Loggable loggable = Loggable.MESSAGE;
     @Setter @Getter @Accessors(chain = true)
     private boolean system;
 
