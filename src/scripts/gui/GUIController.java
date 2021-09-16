@@ -131,6 +131,7 @@ public class GUIController extends AbstractGUIController {
                     checkClockworks.setSelected(s.isSellClockworks());
                     checkRestocking.setSelected(s.isRestocking());
                     checkRestocking.setSelected(s.isRestocking());
+                    sliderReactions.setValue(s.getReactionTimes());
                 });
         updateSaveNames();
     }
