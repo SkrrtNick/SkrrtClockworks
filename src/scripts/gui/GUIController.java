@@ -7,8 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
-import org.tribot.script.sdk.Log;
 import org.tribot.script.sdk.util.ScriptSettings;
+import scripts.api.functions.Logger;
 import scripts.data.Profile;
 
 import java.net.URL;
@@ -73,9 +73,13 @@ public class GUIController extends AbstractGUIController {
 
     int mouseSpeed, reactions;
 
+    private SpinnerValueFactory<Integer> craftingFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(8, 14);
+    private SpinnerValueFactory<Integer> constructionFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(25, 50);
+    private Logger logger = new Logger().setHeader("GUI");
+
     @FXML
     void btnLoadPressed(ActionEvent event) {
-
+        load(txtProfile.getValue());
     }
 
     @FXML
@@ -90,11 +94,10 @@ public class GUIController extends AbstractGUIController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ScriptSettings loadableProfiles = ScriptSettings.getDefault();
-        List<String> profiles = loadableProfiles.getSaveNames();
-        txtProfile.setItems(FXCollections.observableList(profiles));
-        spinCrafting.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(8,15));
-        spinConstruction.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(25,50));
+        updateSaveNames();
+        load("last");
+        spinCrafting.setValueFactory(craftingFactory);
+        spinConstruction.setValueFactory(constructionFactory);
         sliderMouseSpeed.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -112,6 +115,26 @@ public class GUIController extends AbstractGUIController {
 
     }
 
+    public void load(String name) {
+        ScriptSettings loader = ScriptSettings.getDefault();
+        loader.load(name, Profile.class)
+                .ifPresent(s -> {
+                    logger.setMessage("Successfully loaded the profile")
+                            .print();
+                    sliderMouseSpeed.setValue(s.getMouseSpeed());
+                    craftingFactory.setValue(s.getCraftingGoal());
+                    constructionFactory.setValue(s.getConstructionGoal());
+                    checkButler.setSelected(s.isUseButler());
+                    checkReactions.setSelected(s.isUseCustomReactionTimes());
+                    checkMouseSpeed.setSelected(s.isUseCustomMouseSpeed());
+                    checkSkills.setSelected(s.isTrainSkills());
+                    checkClockworks.setSelected(s.isSellClockworks());
+                    checkRestocking.setSelected(s.isRestocking());
+                    checkRestocking.setSelected(s.isRestocking());
+                });
+        updateSaveNames();
+    }
+
     public void save(String name) {
         ScriptSettings saver = ScriptSettings.getDefault();
         Profile profile = new Profile();
@@ -126,7 +149,12 @@ public class GUIController extends AbstractGUIController {
         profile.setUseCustomMouseSpeed(checkMouseSpeed.isSelected());
         profile.setUseCustomReactionTimes(checkReactions.isSelected());
         saver.save(name, profile);
+        updateSaveNames();
     }
 
-
+    public void updateSaveNames() {
+        ScriptSettings loadableProfiles = ScriptSettings.getDefault();
+        List<String> profiles = loadableProfiles.getSaveNames();
+        txtProfile.setItems(FXCollections.observableList(profiles));
+    }
 }
