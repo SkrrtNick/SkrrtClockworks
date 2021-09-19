@@ -28,7 +28,7 @@ public class GUIController extends AbstractGUIController {
     private Button btnLoad;
 
     @DoNotRename
-   @FXML
+    @FXML
     private Button btnSave;
     @DoNotRename
     @FXML
@@ -88,11 +88,17 @@ public class GUIController extends AbstractGUIController {
     @DoNotRename
     @FXML
     private Text txtReactionTimes;
-
+    @DoNotRename
+    @FXML
     int mouseSpeed, reactions;
-
+    @DoNotRename
+    @FXML
     private SpinnerValueFactory<Integer> craftingFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(8, 14);
+    @DoNotRename
+    @FXML
     private SpinnerValueFactory<Integer> constructionFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(25, 50);
+    @DoNotRename
+    @FXML
     private Logger logger = new Logger().setHeader("GUI");
 
     @DoNotRename
@@ -150,7 +156,7 @@ public class GUIController extends AbstractGUIController {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 reactions = (int) sliderReactions.getValue();
-                txtReactionTimes.setText(Integer.toString(reactions));
+                txtReactionTimes.setText(reactions + "%");
             }
         });
 
@@ -173,6 +179,8 @@ public class GUIController extends AbstractGUIController {
                     checkRestocking.setSelected(s.isRestocking());
                     checkRestocking.setSelected(s.isRestocking());
                     sliderReactions.setValue(s.getReactionTimes());
+                    txtReactionTimes.setText(Integer.toString(s.getReactionTimes()));
+                    txtMouseSpeed.setText(Integer.toString(s.getMouseSpeed()));
                     comboTeleport.setValue(s.getGeTeleport());
                     comboSelling.setValue(s.getSellingOption());
                     comboBuying.setValue(s.getBuyingOption());
