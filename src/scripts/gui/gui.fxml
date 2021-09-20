@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.image.Image?>
@@ -31,6 +32,8 @@
                   <Image url="https://oldschool.runescape.wiki/images/thumb/4/43/Clockwork_detail.png/1024px-Clockwork_detail.png" />
                </image>
             </ImageView>
+            <Hyperlink fx:id="linkThread" layoutX="14.0" layoutY="340.0" onAction="#threadClicked" text="Forum Thread" />
+            <Hyperlink fx:id="linkProfile" layoutX="14.0" layoutY="363.0" onAction="#profileClicked" text="Message the Scripter" />
          </children>
       </Pane>
    </left>
