@@ -6,6 +6,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -14,6 +15,11 @@ import scripts.api.functions.Loggable;
 import scripts.api.functions.Logger;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -133,6 +139,7 @@ public class GUI extends Application {
 
         stage.setScene(scene);
         stage.setTitle("SkrrtClockworks");
+        stage.getIcons().add(new Image("https://www.osrsbox.com/osrsbox-db/items-icons/8792.png"));
     }
 
     public <T extends AbstractGUIController> T getController() {
@@ -168,4 +175,9 @@ public class GUI extends Application {
     private void waitForInit() {
         Waiting.waitUntil(5000, () -> stage != null);
     }
+
+    public void openBrowser(String url) throws IOException, URISyntaxException {
+        Desktop.getDesktop().browse(new URI(url));
+    }
+
 }

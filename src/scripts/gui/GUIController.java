@@ -1,13 +1,17 @@
 package scripts.gui;
 
 import com.allatori.annotations.DoNotRename;
+import com.sun.javafx.application.HostServicesDelegate;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import lombok.val;
 import org.tribot.script.sdk.Waiting;
 import org.tribot.script.sdk.util.ScriptSettings;
 import scripts.SkrrtClockWork;
@@ -17,19 +21,17 @@ import scripts.data.BuyingOptions;
 import scripts.data.GETeleports;
 import scripts.data.Profile;
 import scripts.data.SellingOptions;
+import scripts.tasks.SellingClockworks;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@DoNotRename
 public class GUIController extends AbstractGUIController {
-    @DoNotRename
-    @FXML
-    private Button btnLoad;
-
-    @DoNotRename
-    @FXML
-    private Button btnSave;
     @DoNotRename
     @FXML
     private Button btnStart;
@@ -53,13 +55,13 @@ public class GUIController extends AbstractGUIController {
     private CheckBox checkSkills;
     @DoNotRename
     @FXML
-    private ComboBox<String> comboSelling;
+    private ComboBox<SellingOptions> comboSelling;
     @DoNotRename
     @FXML
-    private ComboBox<String> comboBuying;
+    private ComboBox<BuyingOptions> comboBuying;
     @DoNotRename
     @FXML
-    private ComboBox<String> comboTeleport;
+    private ComboBox<GETeleports> comboTeleport;
 
     @DoNotRename
     @FXML
@@ -81,9 +83,6 @@ public class GUIController extends AbstractGUIController {
     @FXML
     private Text txtMouseSpeed;
 
-    @DoNotRename
-    @FXML
-    private ComboBox<String> txtProfile;
 
     @DoNotRename
     @FXML
@@ -103,23 +102,40 @@ public class GUIController extends AbstractGUIController {
 
     @DoNotRename
     @FXML
-    void btnLoadPressed(ActionEvent event) {
-        String profileName = txtProfile.getEditor().getText();
-        if (profileName == null || profileName.isBlank()) {
-            logger
-                    .setLoggable(Loggable.ERROR)
-                    .setMessage("Please enter a profile name")
-                    .print();
-        } else {
-            load(txtProfile.getValue());
-        }
+    void profileClicked(ActionEvent event) throws IOException, URISyntaxException {
+        getGUI().openBrowser("https://community.tribot.org/profile/300380-gigiwest123/");
     }
 
     @DoNotRename
     @FXML
-    void btnSavePressed(ActionEvent event) {
-        save(txtProfile.getValue());
+    void threadClicked(ActionEvent event) throws IOException, URISyntaxException {
+        getGUI().openBrowser("https://community.tribot.org/topic/83981-low-reqsmoney-making-skrrtclockworks/");
     }
+
+    @DoNotRename
+    @FXML
+    void loadPressed(ActionEvent event) {
+        load();
+    }
+    @DoNotRename
+    @FXML
+    private Hyperlink linkProfile;
+
+    @DoNotRename
+    @FXML
+    private Hyperlink linkThread;
+
+    @DoNotRename
+    @FXML
+    void savePressed(ActionEvent event) {
+        save();
+    }
+    @DoNotRename
+    @FXML
+    private MenuItem mnuSave;
+    @DoNotRename
+    @FXML
+    private MenuItem mnuLoad;
 
     @DoNotRename
     @FXML
@@ -135,14 +151,15 @@ public class GUIController extends AbstractGUIController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        checkReactions.setDisable(true);
+        sliderReactions.setDisable(true);
         checkSkills.setDisable(true);
         spinCrafting.setDisable(true);
         spinConstruction.setDisable(true);
-        updateSaveNames();
         load("last");
-        comboTeleport.setItems(FXCollections.observableList(GETeleports.getList()));
-        comboSelling.setItems(FXCollections.observableList(SellingOptions.getList()));
-        comboBuying.setItems(FXCollections.observableList(BuyingOptions.getList()));
+        comboTeleport.getItems().setAll(GETeleports.values());
+        comboSelling.getItems().setAll(SellingOptions.values());
+        comboBuying.getItems().setAll(BuyingOptions.values());
         spinCrafting.setValueFactory(craftingFactory);
         spinConstruction.setValueFactory(constructionFactory);
         sliderMouseSpeed.valueProperty().addListener(new ChangeListener<Number>() {
@@ -159,9 +176,18 @@ public class GUIController extends AbstractGUIController {
                 txtReactionTimes.setText(reactions + "%");
             }
         });
-
     }
-
+    void load() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load Profile");
+        fileChooser.setInitialDirectory(ScriptSettings.getDefault().getDirectory());
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Profile", "*.json"));
+        File selectedFile = fileChooser.showOpenDialog(getGUI().getStage());
+        if (selectedFile != null) {
+            logger.setMessage("Selected File: " + selectedFile.getName()).print();
+            load(selectedFile.getName());
+        }
+    }
     public void load(String name) {
         ScriptSettings loader = ScriptSettings.getDefault();
         loader.load(name, Profile.class)
@@ -185,7 +211,31 @@ public class GUIController extends AbstractGUIController {
                     comboSelling.setValue(s.getSellingOption());
                     comboBuying.setValue(s.getBuyingOption());
                 });
-        updateSaveNames();
+    }
+    void save() {
+        val profile = new Profile();
+        profile.setCraftingGoal(spinCrafting.getValue());
+        profile.setConstructionGoal(spinConstruction.getValue());
+        profile.setUseButler(checkButler.isSelected());
+        profile.setReactionTimes((int) sliderReactions.getValue());
+        profile.setMouseSpeed((int) sliderMouseSpeed.getValue());
+        profile.setRestocking(checkRestocking.isSelected());
+        profile.setSellClockworks(checkClockworks.isSelected());
+        profile.setTrainSkills(checkSkills.isSelected());
+        profile.setUseCustomMouseSpeed(checkMouseSpeed.isSelected());
+        profile.setUseCustomReactionTimes(checkReactions.isSelected());
+        profile.setGeTeleport(comboTeleport.getValue());
+        profile.setSellingOption(comboSelling.getValue());
+        profile.setBuyingOption(comboBuying.getValue());
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Profile");
+        fileChooser.setInitialDirectory(ScriptSettings.getDefault().getDirectory());
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Profile", "*.json"));
+        File selectedFile = fileChooser.showSaveDialog(getGUI().getStage());
+        if (selectedFile != null) {
+            logger.setMessage("Saved File: " + selectedFile.getName()).print();
+            ScriptSettings.getDefault().save(selectedFile.getName(), profile);
+        }
     }
 
     public void save(String name) {
@@ -208,13 +258,6 @@ public class GUIController extends AbstractGUIController {
         logger.setLoggable(Loggable.MESSAGE).setMessage("Successfully saved " + name)
                 .print();
         SkrrtClockWork.setRunningProfile(profile);
-        updateSaveNames();
-    }
-
-    public void updateSaveNames() {
-        ScriptSettings loadableProfiles = ScriptSettings.getDefault();
-        List<String> profiles = loadableProfiles.getSaveNames();
-        txtProfile.setItems(FXCollections.observableList(profiles));
     }
 
 }
