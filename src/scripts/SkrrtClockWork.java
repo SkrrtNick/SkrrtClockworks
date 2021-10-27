@@ -31,7 +31,7 @@ import java.net.URL;
 @ScriptManifest(name = "SkrrtClockworks", authors = {"SkrrtNick"}, category = "Money Making")
 public class SkrrtClockWork  implements MessageListening07, TribotScript {
     Logger logger = new Logger().setHeader("SkrrtScripts");
-    DaxWalkerAdapter daxWalkerAdapter = new DaxWalkerAdapter("sub_JmRkbIB2XRYqmf", "7227dd88-8182-4cd9-a3d9-00b8fa6ff56e");
+    DaxWalkerAdapter daxWalkerAdapter = new DaxWalkerAdapter("1", "2");
     private int elipses = 1;
     @Setter
     @Getter
