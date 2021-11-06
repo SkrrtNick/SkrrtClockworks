@@ -6,10 +6,12 @@ import org.tribot.api2007.Inventory;
 import org.tribot.script.sdk.Equipment;
 import org.tribot.script.sdk.GrandExchange;
 import org.tribot.script.sdk.Waiting;
+import org.tribot.script.sdk.Widgets;
 import org.tribot.script.sdk.antiban.PlayerPreferences;
 import org.tribot.script.sdk.cache.BankCache;
 import org.tribot.script.sdk.pricing.Pricing;
 import scripts.SkrrtClockWork;
+import scripts.api.banking.Bank;
 import scripts.api.framework.Priority;
 import scripts.api.framework.Task;
 import scripts.api.functions.Logger;
@@ -46,6 +48,11 @@ public class Restocking implements Task {
     @Override
     public void execute() {
         if(Inventory.isFull()){
+            setShouldRestock(false);
+            return;
+        }
+        if(requiresNoItems()){
+            Widgets.closeAll();
             setShouldRestock(false);
             return;
         }
@@ -99,7 +106,12 @@ public class Restocking implements Task {
                 }
                 if (scripts.api.grandexchange.GrandExchange.close()) {
                     Waiting.waitNormal(600, 98);
-                    setShouldRestock(false);
+                    if(Bank.open() && Waiting.waitUntil(Bank::isOpen)){
+                        Bank.depositInventory();
+                    }
+                    if(org.tribot.script.sdk.Inventory.isEmpty()){
+                        setShouldRestock(false);
+                    }
                 }
             }
         }

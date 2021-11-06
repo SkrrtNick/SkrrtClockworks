@@ -8,7 +8,6 @@ import org.tribot.script.sdk.types.Area;
 import org.tribot.script.sdk.types.GrandExchangeOffer;
 import org.tribot.script.sdk.types.WorldTile;
 import org.tribot.script.sdk.walking.GlobalWalking;
-import scripts.api.functions.Numbers;
 
 public class GrandExchange extends org.tribot.api2007.GrandExchange {
     private static final int GRAND_EXCHANGE_MASTER = 465;

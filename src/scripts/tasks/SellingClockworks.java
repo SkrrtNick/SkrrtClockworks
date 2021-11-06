@@ -35,10 +35,9 @@ public class SellingClockworks implements Task {
         if (GrandExchange.moveToGE()) {
             logger.setMessage("We are at the GE").print();
         }
-        logger.setMessage("Grand Exchange is Open:" + org.tribot.script.sdk.GrandExchange.isOpen()).print();
-        logger.setMessage("Grand Exchange open: " + org.tribot.script.sdk.GrandExchange.open()).print();
         if(org.tribot.script.sdk.GrandExchange.isOpen() || org.tribot.script.sdk.GrandExchange.open()){
             if(Waiting.waitUntil(()->org.tribot.script.sdk.GrandExchange.placeOffer(offerConfig()))){
+                Waiting.waitNormal(2000,300);
                 org.tribot.script.sdk.GrandExchange.collectAll();
             }
         }

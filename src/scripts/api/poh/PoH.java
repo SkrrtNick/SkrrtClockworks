@@ -73,12 +73,6 @@ public class PoH {
                 .isPresent();
     }
 
-    public static boolean hasDemonButler() {
-        return Query.npcs()
-                .nameEquals("Demon butler")
-                .findFirst()
-                .isPresent();
-    }
 
     private static boolean openHouseOptions() {
         if (!GameTab.OPTIONS.isOpen()) {
@@ -116,10 +110,5 @@ public class PoH {
             }
         } return false;
     }
-    public static boolean repeatableTask(){
-       return Query.widgets()
-                .textContains("Repeat last task?")
-                .findFirst()
-                .isPresent();
-    }
+
 }

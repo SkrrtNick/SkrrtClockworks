@@ -2,6 +2,7 @@ package scripts;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import org.tribot.api.General;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.MessageListening07;
@@ -10,11 +11,8 @@ import org.tribot.script.sdk.input.Mouse;
 import org.tribot.script.sdk.painting.Painting;
 import org.tribot.script.sdk.script.TribotScript;
 import org.tribot.script.sdk.util.ScriptSettings;
-import org.tribot.script.sdk.walking.GlobalWalking;
-import org.tribot.script.sdk.walking.adapter.DaxWalkerAdapter;
 import scripts.api.framework.Task;
 import scripts.api.framework.TaskSet;
-import scripts.api.functions.Loggable;
 import scripts.api.functions.Logger;
 import scripts.api.functions.Numbers;
 import scripts.data.Prices;
@@ -29,9 +27,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 @ScriptManifest(name = "SkrrtClockworks", authors = {"SkrrtNick"}, category = "Money Making")
-public class SkrrtClockWork  implements MessageListening07, TribotScript {
+public class SkrrtClockWork implements MessageListening07, TribotScript {
     Logger logger = new Logger().setHeader("SkrrtScripts");
-    DaxWalkerAdapter daxWalkerAdapter = new DaxWalkerAdapter("sub_JmRkbIB2XRYqmf", "7227dd88-8182-4cd9-a3d9-00b8fa6ff56e");
     private int elipses = 1;
     @Setter
     @Getter
@@ -46,7 +43,7 @@ public class SkrrtClockWork  implements MessageListening07, TribotScript {
     private static final long START_TIME = System.currentTimeMillis();
     private URL fxml;
     private GUI gui;
-    private double version = .04;
+    private double version = .07;
 
     @Setter
     @Getter
@@ -70,23 +67,8 @@ public class SkrrtClockWork  implements MessageListening07, TribotScript {
     Font versionFont = new Font("Calibri", 1, 10);
 
 
-
     private String getEllipses() {
-        String e = "";
-        switch (elipses) {
-            case 1:
-                e = ".";
-                break;
-            case 2:
-                e = "..";
-                break;
-            case 3:
-                e = "...";
-                elipses = 0;
-                break;
-        }
-        elipses++;
-        return e;
+        return ".".repeat(elipses++);
     }
 
 
@@ -108,17 +90,43 @@ public class SkrrtClockWork  implements MessageListening07, TribotScript {
             ui.setColor(Color.ORANGE);
             ui.drawString(String.valueOf(version), 490, 205);
         });
-        if(args != null) {
-            var loadSettings = ScriptSettings.getDefault()
-                    .load(args, Profile.class)
-                    .isPresent();
-            if (loadSettings) {
-                logger.setLoggable(Loggable.MESSAGE).setMessage("Successfully loaded " + args).print();
-                gui.close();
-            } else {
-                logger.setLoggable(Loggable.ERROR).setMessage("There was a problem loading " + args).print();
-            }
+        if (!handleArgs(args)) {
+            runGui();
         }
+        if (getRunningProfile().isUseCustomMouseSpeed()) {
+            Mouse.setSpeed(runningProfile.getMouseSpeed());
+        }
+        if (getRunningProfile().isUseCustomReactionTimes()) {
+            setReactionModifier(runningProfile.getReactionTimes());
+        }
+        logger.setHeader("Profile").setMessage(getRunningProfile().toString()).print();
+//        GlobalWalking.setEngine(daxWalkerAdapter);
+        if (!Login.isLoggedIn()) {
+            Login.login();
+        }
+        while (isRunning) {
+            setStatus("Determining next task...");
+            TaskSet tasks = new TaskSet(new BankingTask(), new SellingClockworks(), new Restocking(), new MovingToHouse(), new MakingClockworks());
+            for (Task task : tasks) {
+                if (task.validate()) {
+                    task.execute();
+                }
+            }
+            General.sleep(20, 40);
+        }
+    }
+
+    private boolean handleArgs(String args) {
+        if (args == null) {
+            return false;
+        }
+        val profile = ScriptSettings.getDefault()
+                .load(args, Profile.class);
+        profile.ifPresent(SkrrtClockWork::setRunningProfile);
+        return profile.isPresent();
+    }
+
+    private void runGui() {
         try {
             fxml = new URL("https://raw.githubusercontent.com/SkrrtNick/SkrrtClockworks/master/src/scripts/gui/gui.fxml");
         } catch (MalformedURLException e) {
@@ -128,29 +136,11 @@ public class SkrrtClockWork  implements MessageListening07, TribotScript {
         gui.show();
         while (gui.isOpen()) {
             setStatus("Waiting on user input" + getEllipses());
+            if (elipses == 4) {
+                elipses = 0;
+            }
             General.sleep(500);
         }
-        if (getRunningProfile().isUseCustomMouseSpeed()) {
-            Mouse.setSpeed(runningProfile.getMouseSpeed());
-        }
-        if (getRunningProfile().isUseCustomReactionTimes()) {
-            setReactionModifier(runningProfile.getReactionTimes());
-        }
-        logger.setHeader("Profile").setMessage(getRunningProfile().toString()).print();
-        GlobalWalking.setEngine(daxWalkerAdapter);
-        if (!Login.isLoggedIn()) {
-            Login.login();
-        }
-        while (isRunning) {
-            setStatus("Determining next task...");
-            TaskSet tasks = new TaskSet(new SellingClockworks(), new BankingTask(), new Restocking());
-//            TaskSet tasks = new TaskSet(new BankingTask(), new SellingClockworks(), new Restocking(), new MovingToHouse(), new MakingClockworks());
-            for (Task task : tasks) {
-                if (task.validate()) {
-                    task.execute();
-                }
-            }
-            General.sleep(20, 40);
-        }
     }
+
 }

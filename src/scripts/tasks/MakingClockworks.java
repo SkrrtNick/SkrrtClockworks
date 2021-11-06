@@ -7,7 +7,6 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.sdk.*;
 import org.tribot.script.sdk.input.Keyboard;
 import org.tribot.script.sdk.query.Query;
-import org.tribot.script.sdk.types.Widget;
 import scripts.SkrrtClockWork;
 import scripts.api.framework.Priority;
 import scripts.api.framework.Task;
@@ -22,6 +21,7 @@ public class MakingClockworks implements Task, MessageListening07 {
     private static int clockworks = 0;
     private String[] chatResponses = {"Yes", "Clockwork mechanism", "Okay, here's 10,000 coins."};
     private final int AMOUNT_INTERFACE = 162;
+    Logger logger = new Logger().setHeader("Clockworks");
 
     @Override
     public Priority priority() {
@@ -36,68 +36,12 @@ public class MakingClockworks implements Task, MessageListening07 {
     @Override
     public void execute() {
         SkrrtClockWork.setStatus("Making Clockworks");
-        Logger logger = new Logger().setHeader("Clockworks");
         if (!PoH.hasWorkshop()) {
             logger.setMessage("Terminating script, we need a workshop!").print();
             SkrrtClockWork.setRunning(false);
         }
-        if (getProfile().isUseButler() && needsButler() && !PoH.callButler()) return;
-        if (Inventory.isFull() && !Inventory.contains(ItemID.STEEL_BAR) && scripts.api.functions.Interaction.useOn("Clockwork", "Demon butler")) {
-            if (Waiting.waitUntil(NPCInteraction::isConversationWindowUp)) {
-                if (!ChatScreen.handle(chatResponses)) return;
-                Waiting.waitNormal(600, 175);
-                var enterAmount = Query.widgets()
-                        .inRoots(AMOUNT_INTERFACE)
-                        .textContains("Enter amount:")
-                        .findFirst()
-                        .map(Widget::isVisible)
-                        .isPresent();
-                Waiting.waitNormal(500, 75);
-                if (!Waiting.waitUntil(3000, () -> enterAmount)) return;
-                int amount = Inventory.getCount(ItemID.CLOCKWORK);
-                logger.setMessage("We need to enter(1) " + amount).print();
-                Keyboard.typeLine(String.valueOf(amount));
-                if (Waiting.waitUntil(NPCInteraction::isConversationWindowUp)) {
-                    if (ChatScreen.handle(chatResponses)) {
-                        Waiting.waitNormal(600, 175);
-                    }
-                }
-                if (Waiting.waitUntil(() -> !Inventory.contains(ItemID.CLOCKWORK))) {
-                    logger.setMessage("Success, we've banked the clockworks").print();
-                    Waiting.waitNormal(75, 15);
-                    Waiting.waitUntil(8000, PoH::hasDemonButler);
-                }
-                Waiting.waitNormal(600, 98);
-            }
-        }
+        handleButler();
 
-        if (!Inventory.contains(ItemID.STEEL_BAR) && !Inventory.isFull() && scripts.api.functions.Interaction.useOn("Steel bar", "Demon butler")) {
-            if (Waiting.waitUntil(NPCInteraction::isConversationWindowUp)) {
-                if (!ChatScreen.handle(chatResponses)) return;
-                Waiting.waitNormal(600, 175);
-                var enterAmount = Query.widgets()
-                        .inRoots(AMOUNT_INTERFACE)
-                        .textContains("Enter amount:")
-                        .findFirst()
-                        .map(Widget::isVisible)
-                        .isPresent();
-                Waiting.waitNormal(500, 75);
-                if (!Waiting.waitUntil(3000, () -> enterAmount)) return;
-                int amount = 28 - Inventory.getAll().size();
-                if (amount > Inventory.getCount(ItemID.STEEL_BAR + 1))
-                    amount = Inventory.getCount(ItemID.STEEL_BAR + 1);
-                logger.setMessage("We need to enter(2) " + amount).print();
-                Waiting.waitNormal(600, 98);
-                Keyboard.typeLine(String.valueOf(amount));
-                if (Waiting.waitUntil(8000, NPCInteraction::isConversationWindowUp)) {
-                    ChatScreen.handle(chatResponses);
-                    Waiting.waitNormal(600, 175);
-                }
-                if (Waiting.waitUntil(() -> Inventory.contains(ItemID.STEEL_BAR))) {
-                    logger.setMessage("Success, we've un-noted steel bars.").print();
-                }
-            }
-        }
         if (Inventory.contains(ItemID.STEEL_BAR) && Interaction.interactObj("Clockmaker's bench", "Craft")) {
             if (Waiting.waitUntil(() -> Query.widgets().textEquals("Clockwork mechanism").findFirst().isPresent())) {
                 if (Numbers.getDecision("make clockworks", 75) > 75) {
@@ -112,7 +56,7 @@ public class MakingClockworks implements Task, MessageListening07 {
 
     }
 
-    boolean conditionsMet() {
+    private boolean conditionsMet() {
         return Skill.CRAFTING.getActualLevel() >= 8 && Skill.CONSTRUCTION.getActualLevel() >= 25 && hasRequiredItems();
     }
 
@@ -124,7 +68,76 @@ public class MakingClockworks implements Task, MessageListening07 {
         return SkrrtClockWork.getRunningProfile();
     }
 
-    boolean needsButler() {
-        return (Inventory.contains(ItemID.STEEL_BAR + 1) && !Inventory.contains(ItemID.STEEL_BAR)) || (Inventory.isFull() && !Inventory.contains(ItemID.STEEL_BAR));
+    private boolean shouldUnnote() {
+        return !Inventory.contains(ItemID.STEEL_BAR) && Inventory.contains(ItemID.STEEL_BAR + 1) && !Inventory.isFull();
+    }
+
+    private boolean shouldSendClockworks() {
+        return Inventory.contains(ItemID.CLOCKWORK) && !Inventory.contains(ItemID.STEEL_BAR);
+    }
+
+
+    private boolean handleButler() {
+        int itemID = 0;
+        int amount = 0;
+        if (!getProfile().isUseButler() || (!shouldUnnote() && !shouldSendClockworks())) {
+            return true;
+        }
+        if (shouldUnnote()) {
+            itemID = ItemID.STEEL_BAR + 1;
+            amount = 28 - Inventory.getAll().size();
+            if (amount > Inventory.getCount(ItemID.STEEL_BAR + 1)) {
+                amount = Inventory.getCount(ItemID.STEEL_BAR + 1);
+            }
+        }
+        if (shouldSendClockworks()) {
+            itemID = ItemID.CLOCKWORK;
+            amount = Inventory.getCount(ItemID.CLOCKWORK);
+        }
+        if (PoH.callButler()) {
+            if (useOnButler(itemID)) {
+                Waiting.waitNormal(600, 175);
+                Waiting.waitUntil(NPCInteraction::isConversationWindowUp);
+            }
+        }
+        if (ChatScreen.isOpen()) {
+            if (ChatScreen.handle(chatResponses)) {
+                Waiting.waitNormal(600, 175);
+            }
+            var enterAmount = Query.widgets()
+                    .inRoots(AMOUNT_INTERFACE)
+                    .textContains("Enter amount:")
+                    .isVisible()
+                    .findFirst()
+                    .isPresent();
+            if (!Waiting.waitUntil(3000, () -> enterAmount)) return false;
+            Waiting.waitNormal(600, 98);
+            Keyboard.typeLine(String.valueOf(amount));
+            Waiting.waitNormal(600,175);
+        }
+        // waiting for demon butler to return
+        if (Waiting.waitUntil(8000, NPCInteraction::isConversationWindowUp)) {
+            if (ChatScreen.handle(chatResponses)) {
+                Waiting.waitNormal(600, 175);
+            }
+        }
+        int finalItemID = itemID;
+        if (Waiting.waitUntil(() -> Inventory.contains(finalItemID))) {
+            logger.setMessage("Success, we've handled the butler.").print();
+        }
+        return true;
+    }
+
+    private boolean useOnButler(int itemID) {
+        return Query.npcs()
+                .nameEquals("Demon butler")
+                .findFirst()
+                .map(i ->
+                        Query.inventory()
+                                .idEquals(itemID)
+                                .findFirst()
+                                .map(s -> s.useOn(i))
+                                .orElse(false))
+                .orElse(false);
     }
 }
